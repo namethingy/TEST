@@ -8,14 +8,13 @@ uint32_t Timer;
 float Phi_dot, Theta_dot, Psi_dot; //rotational speed around X,Y and Z axis respectively 
 float X_dot_dot, Y_dot_dot, Z_dot_dot; // accelaration in X Y and  Z directions
 
-float Phi_dot_prev, Theta_dot_prev, Psi_dot_prev; //rotational speed around X,Y and Z axis respectively 
-float X_dot_dot_prev, Y_dot_dot_prev, Z_dot_dot_prev; // accelaration in X Y and  Z directions
-//float gyro_prev[0.0, 0.0, 0.0];
-//float acc_prev[0.0, 0.0, 0.0];
+float Phi_dot_prev, Theta_dot_prev, Psi_dot_prev; //rotational speed around X,Y and Z axis respectively //float gyro_prev[0.0, 0.0, 0.0];
+float X_dot_dot_prev, Y_dot_dot_prev, Z_dot_dot_prev; // accelaration in X Y and  Z directions //float acc_prev[0.0, 0.0, 0.0];
 
 float Phi, Theta, Psi; // rotational angle around X, Y, Z axis respectively in degrees
 
-float gyro_alpha = 0.01;
+float gyro_alpha = 0.01; //is this the same as Low Pass filter?
+
 float acc_alpha = 0.1;
 
 float g = 9.81;
@@ -34,6 +33,28 @@ void readacc()
   Z_dot_dot = myIMU.readFloatAccelZ()-0.012;  
 }
 
+
+void IIRgyro()
+{
+  Phi_dot = gyro_alpha * Phi_dot_prev + (1 - gyro_alpha) * Phi_dot;
+  Theta_dot = gyro_alphaa * Theta_dot_prev + (1 - gyro_alpha) * Theta_dot;
+  Psi_dot = gyro_alpha * Psi_dot_prev + (1 - gyro_alpha) * Psi_dot;
+
+  Phi_dot_prev=Phi_dot;
+  Theta_dot_prev=Theta_dot;
+  Psi_dot_prev=Psi_dot;
+}
+
+void IIRacc()
+{
+  X_dot_dot = acc_alpha * X_dot_dot_prev + (1 - acc_alpha) * X_dot_dot;
+  Y_dot_dot = acc_alpha * Y_dot_dot_prev + (1 - acc_alpha) * Y_dot_dot;
+  Z_dot_dot = acc_alpha * Z_dot_dot_prev + (1 - acc_alpha) * Z_dot_dot;
+
+  X_dot_dot_prev=X_dot_dot;
+  Y_dot_dot_prev=Y_dot_dot;
+  Z_dot_dot_prev=Z_dot_dot;
+}
 
 
 void setup() {
