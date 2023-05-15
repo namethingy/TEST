@@ -1,0 +1,65 @@
+#include <LSM6DS3.h>
+#include <Wire.h>
+#include <math.h>
+
+LSM6DS3 myIMU(I2C_MODE, 0x6A);    //I2C device address 0x6A
+uint32_t Timer;
+
+float Phi_dot, Theta_dot, Psi_dot; //rotational speed around X,Y and Z axis respectively 
+float X_dot_dot, Y_dot_dot, Z_dot_dot; // accelaration in X Y and  Z directions
+
+float Phi_dot_prev, Theta_dot_prev, Psi_dot_prev; //rotational speed around X,Y and Z axis respectively 
+float X_dot_dot_prev, Y_dot_dot_prev, Z_dot_dot_prev; // accelaration in X Y and  Z directions
+//float gyro_prev[0.0, 0.0, 0.0];
+//float acc_prev[0.0, 0.0, 0.0];
+
+float Phi, Theta, Psi; // rotational angle around X, Y, Z axis respectively in degrees
+
+float gyro_alpha = 0.01;
+float acc_alpha = 0.1;
+
+float g = 9.81;
+
+void readgyro()
+{
+  Phi_dot = myIMU.readFloatGyroX()+0.67;
+  Theta_dot = myIMU.readFloatGyroY()+1.135;
+  Psi_dot = myIMU.readFloatGyroZ()-0.8;  
+}
+
+void readacc()
+{
+  X_dot_dot = myIMU.readFloatAccelX()-0.0165;
+  Y_dot_dot = myIMU.readFloatAccelY()-0.005;
+  Z_dot_dot = myIMU.readFloatAccelZ()-0.012;  
+}
+
+
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  while (!Serial);
+  //Call .begin() to configure the IMUs
+  if (myIMU.begin() != 0) {
+    Serial.println("Device error");
+  } else {
+    Serial.println("OK");
+  }
+/*
+  uint8_t dataToWrite = 0;  //Temporary variable
+
+    //Setup the accelerometer******************************
+    dataToWrite = 0; //Start Fresh!
+    dataToWrite |= LSM6DS3_ACC_GYRO_BW_XL_100Hz;
+    dataToWrite |= LSM6DS3_ACC_GYRO_FS_XL_8g;
+    dataToWrite |= LSM6DS3_ACC_GYRO_ODR_XL_104Hz;
+
+    //Now, write the patched together data
+    errorsAndWarnings += myIMU.writeRegister(LSM6DS3_ACC_GYRO_CTRL1_XL, dataToWrite);
+
+    //Set the ODR bit
+    errorsAndWarnings += myIMU.readRegister(&dataToWrite, LSM6DS3_ACC_GYRO_CTRL4_C);
+    dataToWrite &= ~((uint8_t)LSM6DS3_ACC_GYRO_BW_SCAL_ODR_ENABLED);
+    */
+}
